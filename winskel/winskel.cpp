@@ -3,9 +3,9 @@
 
 
 
-DRIVER_UNLOAD WinSkelUnload;
+static DRIVER_UNLOAD WinSkelUnload;
 #pragma warning(suppress:26461)
-void WinSkelUnload(PDRIVER_OBJECT DriverObject)
+static void WinSkelUnload(PDRIVER_OBJECT DriverObject)
 {
 	UNREFERENCED_PARAMETER(DriverObject);
 	return;
