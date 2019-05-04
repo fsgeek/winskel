@@ -1,16 +1,26 @@
 #include <ntifs.h>
 #include <ntstatus.h>
 
-extern "C" {
-	NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, const PUNICODE_STRING RegistryPath);
-}
 
-DRIVER_INITIALIZE DriverEntry;
-#pragma ignore(warning:26461) // we don't mark it as const because we will be modifying it
-NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, const PUNICODE_STRING RegistryPath)
+
+DRIVER_UNLOAD WinSkelUnload;
+#pragma warning(suppress:26461)
+void WinSkelUnload(PDRIVER_OBJECT DriverObject)
 {
 	UNREFERENCED_PARAMETER(DriverObject);
-	UNREFERENCED_PARAMETER(RegistryPath);
+	return;
+}
 
-	return STATUS_NOT_IMPLEMENTED;
+extern "C" {
+	DRIVER_INITIALIZE DriverEntry;
+#pragma warning(suppress:26461)
+	NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
+	{
+		UNREFERENCED_PARAMETER(DriverObject);
+		UNREFERENCED_PARAMETER(RegistryPath);
+
+		DriverObject->DriverUnload = WinSkelUnload;
+
+		return STATUS_NOT_IMPLEMENTED;
+	}
 }

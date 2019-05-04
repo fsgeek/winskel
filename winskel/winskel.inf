@@ -6,27 +6,50 @@
 Signature="$WINDOWS NT$"
 Class=System
 ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
-Provider=%ManufacturerName%
-DriverVer=
+Provider=%ProviderName%
+DriverVer=05/04/2019,0.1.0.0
 CatalogFile=winskel.cat
 
 [DestinationDirs]
 DefaultDestDir = 12
 
-
 [SourceDisksNames]
 1 = %DiskName%,,,""
 
 [SourceDisksFiles]
+winskel.sys = 1,,
 
+[DefaultInstall.nt$ARCH$]
+OptionDesc  = %ServiceDescription%
+CopyFiles = winskel.DriverFiles
 
-[Manufacturer]
-%ManufacturerName%=Standard,NT$ARCH$
+[DefaultInstall.nt$ARCH$.Services]
+AddService = %ServiceName%,,winskel.Service
 
-[Standard.NT$ARCH$]
+[DefaultUninstall.nt$ARCH$]
+LegacyUninstall=1
+DelService = %ServiceName%,0x200      ;Ensure service is stopped before deleting
+
+[winskel.DriverFiles]
+%DriverName%.sys
+
+[winskel.AddRegistry]
+HKR,,BreakOnEntry,FLG_ADDREG_TYPE_DWORD,1
+
+[winskel.Service]
+DisplayName      = %ServiceName%
+Description      = %ServiceDescription%
+ServiceBinary    = %12%\%DriverName%.sys        ;%windir%\system32\drivers\
+ServiceType      = 2                            ;SERVICE_FILE_SYSTEM_DRIVER
+StartType        = 3                            ;SERVICE_DEMAND_START
+ErrorControl     = 1                            ;SERVICE_ERROR_NORMAL
+LoadOrderGroup   = "File System"
+AddReg           = winskel.AddRegistry
 
 
 [Strings]
-ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
-ClassName=""
-DiskName="winskel Source Disk"
+ProviderName="Tony Mason"
+DiskName="winskel Installation Disk"
+ServiceDescription = "Windows File System Skeleton"
+DriverName = "winskel"
+ServiceName = %DriverName%
