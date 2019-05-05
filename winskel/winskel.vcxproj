@@ -182,6 +182,9 @@
     <ClCompile Include="cpprt.cpp" />
     <ClCompile Include="winskel.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cpprt.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

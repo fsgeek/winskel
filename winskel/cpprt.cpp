@@ -107,3 +107,115 @@ void __cdecl operator delete(void *pVoid)
 	free(pVoid, default_tag);
 }
 
+typedef void(__cdecl* _PVFV)(void);
+
+typedef struct _CPPRT_EXIT_ENTRY {
+	LIST_ENTRY ListEntry;
+	_PVFV	   ExitFunction;
+} CPPRT_EXIT_ENTRY, *PCPPRT_EXIT_ENTRY;
+
+LIST_ENTRY CpprtExitListHead;
+
+
+//
+// onexit is a standard (runtime) routine for requesting a callback at runtime termination
+//
+_PVFV __cdecl onexit(_PVFV ExitFunction)
+
+{
+#pragma warning(suppress:26493) // we're on the boundary here
+	PCPPRT_EXIT_ENTRY exitEntry = (CPPRT_EXIT_ENTRY *)ExAllocatePoolWithTag(PagedPool, sizeof(CPPRT_EXIT_ENTRY), 'ppcW');
+
+	if (nullptr == exitEntry) {
+		return nullptr;
+	}
+	exitEntry->ExitFunction = ExitFunction;
+	InsertHeadList(&CpprtExitListHead, &exitEntry->ListEntry); // push onto stack
+
+	return ExitFunction;
+}
+
+_Function_class_(DRIVER_UNLOAD)
+static void (*CppRtSavedDriverUnload)(PDRIVER_OBJECT) = nullptr;
+
+static void CppRTDriverUnload(PDRIVER_OBJECT DriverObject)
+{
+	PCPPRT_EXIT_ENTRY exitEntry = nullptr;
+
+	// First, cleanup the driver
+#pragma warning(suppress:28023 28175) // it complains about annotating this as a driver unload function, but it is annotated as such.
+	DriverObject->DriverUnload = CppRtSavedDriverUnload;
+	if (nullptr != CppRtSavedDriverUnload) {
+		CppRtSavedDriverUnload(DriverObject);
+	}
+
+	// Now shut down the runtime
+	while (!IsListEmpty(&CpprtExitListHead)) {
+#pragma warning(suppress:26481)
+		exitEntry = CONTAINING_RECORD(RemoveHeadList(&CpprtExitListHead), CPPRT_EXIT_ENTRY, ListEntry);
+
+		if (nullptr != exitEntry && nullptr != exitEntry->ExitFunction) {
+			__try {
+				(exitEntry->ExitFunction)();
+			}
+#pragma warning(suppress:6320 6322) // yes, it might mask exceptions - that's the *point*
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+				// ignore for now
+			}
+		}
+
+		ExFreePoolWithTag(exitEntry, 'ppcW');
+		exitEntry = nullptr;
+	}
+}
+
+extern "C" {
+#if defined(_IA64_) || defined(_AMD64_)
+#pragma section(".CRT$XCA",long,read)
+	__declspec(allocate(".CRT$XCA")) void(*__crtXca[1])(void) = { nullptr };
+#pragma section(".CRT$XCZ",long,read)
+	__declspec(allocate(".CRT$XCZ")) void(*__crtXcz)(void) = { nullptr };
+#pragma data_seg()
+#else
+#pragma data_seg(".CRT$XCA")
+	void(*__crtXca[1])(void) = { 0 };
+#pragma data_seg(".CRT$XCZ")
+	void(*__crtXcz[1])(void) = { 0 };
+#pragma data_seg()
+#endif
+
+	NTSTATUS cpp_rt_pre_init(void) noexcept
+	{
+		InitializeListHead(&CpprtExitListHead);
+
+#pragma warning(push)
+#pragma warning(disable: 26489) // if these pointers are NULL we will blow up, and deservedly so because the compiler screwed up
+#pragma warning(disable: 26485) // "pointer decay" isn't going to happen here
+		for (_PVFV* initializer = (_PVFV*)__crtXca; nullptr != initializer && initializer < (_PVFV*)__crtXcz; initializer++) {
+			if (nullptr != *initializer) {
+				__try {
+					(**initializer)();
+				}
+#pragma warning(suppress:6320) // yes, the purpose of this is to catch errors that simply should not be happening
+				__except (EXCEPTION_EXECUTE_HANDLER) {
+					return STATUS_ACCESS_VIOLATION;
+				}
+			}
+		}
+#pragma warning(pop)
+
+		return STATUS_SUCCESS;
+	}
+
+
+#pragma warning(suppress:26461) // the analyzer complains that I should use const for the Registry
+	NTSTATUS cpp_rt_post_init(PDRIVER_OBJECT DriverObject, const PUNICODE_STRING RegistryPath) noexcept
+	{
+#pragma warning(suppress: 28023 28175) // we don't get to control the annotation on someone else's function.
+		CppRtSavedDriverUnload = DriverObject->DriverUnload;
+#pragma warning(suppress: 28023 28175) // this kind of driver manipulates the unload function
+		DriverObject->DriverUnload = CppRTDriverUnload;
+		UNREFERENCED_PARAMETER(RegistryPath);
+		return STATUS_SUCCESS;
+	}
+}
