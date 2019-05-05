@@ -144,21 +144,33 @@
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
+    <Link>
+      <AdditionalOptions>/ignore:4210 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
+    <Link>
+      <AdditionalOptions>/ignore:4210 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
+    <Link>
+      <AdditionalOptions>/ignore:4210 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
     </ClCompile>
+    <Link>
+      <AdditionalOptions>/ignore:4210 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Inf Include="winskel.inf" />
@@ -167,6 +179,7 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cpprt.cpp" />
     <ClCompile Include="winskel.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

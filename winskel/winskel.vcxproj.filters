@@ -27,5 +27,8 @@
     <ClCompile Include="winskel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cpprt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
