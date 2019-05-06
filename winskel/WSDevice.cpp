@@ -32,7 +32,15 @@ NTSTATUS WSDevice::InvalidDeviceRequest(_In_ PIRP Irp)
 	return status;
 }
 
-
+_Use_decl_annotations_
+NTSTATUS WSDevice::CompleteRequest(PIRP Irp, NTSTATUS Status)
+{
+	if (STATUS_PENDING != Status) {
+		Irp->IoStatus.Status = Status;
+		IoCompleteRequest(Irp, IO_NO_INCREMENT);
+	}
+	return Status;
+}
 
 #pragma warning(push)
 #pragma warning(disable:26432) // "you must override all default operations" - yeah, right
@@ -43,6 +51,7 @@ WSDevice::~WSDevice() noexcept
 
 #pragma warning(push)
 #pragma warning(disable:6014) // it insists the device object is being leaked, but we've saved it
+_Must_inspect_result_
 WSDevice* WSDevice::CreateWSDevice(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING DeviceName)
 {
 	PDEVICE_OBJECT deviceObject = nullptr;

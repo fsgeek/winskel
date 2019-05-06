@@ -182,11 +182,13 @@
     <ClCompile Include="cpprt.cpp" />
     <ClCompile Include="winskel.cpp" />
     <ClCompile Include="winskelctrl.cpp" />
+    <ClCompile Include="WSControlDevice.cpp" />
     <ClCompile Include="WSDevice.cpp" />
     <ClCompile Include="wsdevobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpprt.h" />
+    <ClInclude Include="WSControlDevice.h" />
     <ClInclude Include="WSDevice.h" />
     <ClInclude Include="wsdevobj.h" />
   </ItemGroup>

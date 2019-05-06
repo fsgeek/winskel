@@ -37,9 +37,12 @@ public:
 	virtual NTSTATUS QueryQuota(_In_ PIRP Irp)  { return InvalidDeviceRequest(Irp); }
 	virtual NTSTATUS SetQuota(_In_ PIRP Irp)  { return InvalidDeviceRequest(Irp); }
 	virtual NTSTATUS PnP(_In_ PIRP Irp)  { return InvalidDeviceRequest(Irp); }
+	virtual NTSTATUS CompleteRequest(_In_ _Post_invalid_ PIRP Irp, NTSTATUS Status);
 	virtual ~WSDevice();
 
-	__drv_aliasesMem
+	PDEVICE_OBJECT GetDeviceObject(void) noexcept { return m_DeviceObject; }
+
+	_Must_inspect_result_
 	static WSDevice* CreateWSDevice(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING DeviceName);
 };
 
