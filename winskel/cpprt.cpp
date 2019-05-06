@@ -103,6 +103,12 @@ void __cdecl operator delete(void* pVoid, ULONG tag)
 	free(pVoid, tag);
 }
 
+void __cdecl operator delete(void* buffer, size_t length)
+{
+	UNREFERENCED_PARAMETER(length);
+	free(buffer);
+}
+
 void __cdecl operator delete(void *pVoid)
 {
 	free(pVoid, default_tag);

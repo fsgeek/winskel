@@ -182,6 +182,7 @@
     <ClCompile Include="cpprt.cpp" />
     <ClCompile Include="winskel.cpp" />
     <ClCompile Include="winskelctrl.cpp" />
+    <ClCompile Include="wsdevobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpprt.h" />
