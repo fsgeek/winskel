@@ -36,12 +36,18 @@
     <ClCompile Include="wsdevobj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WSDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpprt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="wsdevobj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WSDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
