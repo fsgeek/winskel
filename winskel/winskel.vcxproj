@@ -181,9 +181,11 @@
   <ItemGroup>
     <ClCompile Include="cpprt.cpp" />
     <ClCompile Include="winskel.cpp" />
+    <ClCompile Include="winskelctrl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpprt.h" />
+    <ClInclude Include="wsdevobj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

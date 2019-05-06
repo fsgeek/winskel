@@ -90,6 +90,7 @@ void *__cdecl operator new(size_t size, POOL_TYPE pool, ULONG tag)
 }
 
 
+// placement new
 void *__cdecl operator new(size_t size, void *buffer)
 {
 	UNREFERENCED_PARAMETER(size);
